@@ -1,4 +1,6 @@
+using AutoMapper;
 using Microsoft.EntityFrameworkCore;
+using MusicAPI;
 using MusicAPI.DbStuff;
 using MusicAPI.DbStuff.Repositories;
 using MusicAPI.DbStuff.Repositories.IRepositories;
@@ -16,6 +18,11 @@ var connectString = @"Data Source=(localdb)\MSSQLLocalDB;Initial Catalog=JulyIde
 builder.Services.AddDbContext<WebContext>(options =>
     options.UseSqlServer(connectString));
 builder.Services.AddScoped<IDbSeed, DbSeed>();
+IMapper mapper = MappingConfig.RegisterMaps().CreateMapper();
+
+builder.Services.AddSingleton(mapper);
+
+builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
 builder.Services.AddScoped<ITracksRepository, TracksRepository>();
 var app = builder.Build();

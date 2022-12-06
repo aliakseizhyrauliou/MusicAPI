@@ -1,5 +1,7 @@
+using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using MusicAPI.DbStuff.Repositories.IRepositories;
+using MusicAPI.ViewModels;
 
 namespace MusicAPI.Controllers
 {
@@ -8,9 +10,12 @@ namespace MusicAPI.Controllers
     public class TracksController : ControllerBase
     {
         private readonly ITracksRepository _tracksRepository;
-        public TracksController(ITracksRepository repository)
+        private readonly IMapper _mapper;
+        public TracksController(ITracksRepository repository,
+            IMapper mapper)
         {
             _tracksRepository = repository;
+            _mapper = mapper;   
         }
 
         [HttpGet]
@@ -19,7 +24,7 @@ namespace MusicAPI.Controllers
             int subsidiaryVariable;
             if (startIndex == 0 && endIndex == 0)
             {
-                return Ok(await _tracksRepository.GetAllAsync());
+                return Ok(_mapper.Map<IEnumerable<TrackViewModel>>(await _tracksRepository.GetAllAsync()));
             }
             else if (endIndex < startIndex) 
             {
@@ -28,9 +33,9 @@ namespace MusicAPI.Controllers
                 startIndex = subsidiaryVariable;
 
                 var result = await _tracksRepository.GetRangeAsync(startIndex, endIndex);
-                return Ok(result.Reverse());
+                return Ok(_mapper.Map<IEnumerable<TrackViewModel>>(result.Reverse()));
             }
-            return Ok(await _tracksRepository.GetRangeAsync(startIndex, endIndex));
+            return Ok(_mapper.Map<IEnumerable<TrackViewModel>>(await _tracksRepository.GetRangeAsync(startIndex, endIndex)));
         }
 
     };
